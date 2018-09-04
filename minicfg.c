@@ -88,6 +88,7 @@ int main(int argc, char **argv) {
     if (argc > 3) bb_display = argv[3];
     if (argc > 4) bb_port = atoi(argv[4]);
     if (argc > 5) bb_hosts = argv[5];
+    int found;
 
     if (!start_winsock()) return 0;
 
@@ -139,15 +140,19 @@ int main(int argc, char **argv) {
         // Send and receive data.
         char sendbuf[32000] = "Server: Sending Data.";
  
-	sprintf(machine, "brokencfg-%s", cli);
 	fp = fopen(bb_hosts, "r");
-	if (fp) {
-		while (fgets(b, sizeof b, fp)) {
-			n = sscanf(b, "%s %s", ipaddr, machine);
-			if (n != 3) continue;
-			if (!strcmp(ipaddr, cli)) break;
-		}
+	if (fp == NULL) {
+		fprintf(stderr, "Can't open file '%s'\n", bb_hosts);
+		return EXIT_FAILURE;
 	}
+	found = 0;
+	while (!found && fgets(b, sizeof b, fp)) {
+		n = sscanf(b, "%s %s", ipaddr, machine);
+		if (n != 2) continue;
+		if (!strcmp(ipaddr, cli)) found = 1;
+	}
+	fclose(fp);
+	if (!found) sprintf(machine, "brokencfg-%s", cli);
 	snprintf(sendbuf, sizeof sendbuf,
 		"machine %s\n"
 		"display %s\n"
