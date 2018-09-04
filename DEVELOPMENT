@@ -19,6 +19,11 @@ and
 After you've ensured all tools are in $PATH, just cd to MrBig and type "make"
 which will build both the 32-bit and 64-bit versions.
 
+Cross-compiling on Linux requires the mingw toolschains, example from CentOS :
+
+yum install mingw32-gcc mingw64-gcc
+make
+
 DEBUGGING
 =========
 windows has no native support for core dumps, so GDB is of limited use.
